@@ -1,11 +1,11 @@
+import styles from "@/app/(beforeLogin)/_component/main.module.css";
 import Image from "next/image";
-import styles from "./page.module.css";
-import zLogo from "../../public/zlogo.png";
+import zLogo from "../../../../public/zlogo.png";
 import Link from "next/link";
 
 export default function Main() {
   return (
-    <div className={styles.container}>
+    <>
       <div className={styles.left}>
         <Image src={zLogo} alt="logo" />
       </div>
@@ -20,6 +20,6 @@ export default function Main() {
           로그인
         </Link>
       </div>
-    </div>
+    </>
   );
 }
