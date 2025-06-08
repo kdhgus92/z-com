@@ -1,10 +1,12 @@
-import { ReactNode } from "react";
 import style from "@/app/(afterLogin)/layout.module.css";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { ReactNode } from "react";
 import ZLogo from "../../../public/zlogo.png";
-import NavMenu from "./_component/NavMenu";
+import FollowRecommend from "./_component/FollowRecommend";
 import LogoutButton from "./_component/LogoutButton";
+import NavMenu from "./_component/NavMenu";
+import TrendSection from "./_component/TrendSection";
 
 export default function AfterLoginLayout({
   children,
@@ -47,8 +49,12 @@ export default function AfterLoginLayout({
                 <input type="search" />
               </form>
             </div>
+            <TrendSection />
             <div className={style.followRecommend}>
               <h3>팔로우 추천</h3>
+              <FollowRecommend />
+              <FollowRecommend />
+              <FollowRecommend />
             </div>
           </section>
         </div>
