@@ -86,7 +86,7 @@ body {
 }
 
 body {
-  color: var(--foreground);
+  color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-end-rgb));
 }
 

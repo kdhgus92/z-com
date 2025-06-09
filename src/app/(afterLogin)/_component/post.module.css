@@ -14,6 +14,12 @@
   background-color: rgba(0, 0, 0, 0.03);
 }
 
+@media (prefers-color-scheme: dark) {
+  .post {
+    border-color: rgb(47, 51, 54);
+  }
+}
+
 .postWrapper {
   display: flex;
   flex-direction: row;

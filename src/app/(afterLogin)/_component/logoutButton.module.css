@@ -7,7 +7,7 @@
   cursor: pointer;
   border: none;
   align-items: center;
-  background-color: #fff;
+  background-color: rgb(var(--background-end-rgb));
   text-align: left;
 }
 .logOutButton:hover {
@@ -27,4 +27,17 @@
 }
 .logOutUserName > div:first-child {
   font-weight: bold;
+}
+
+@media all and (min-width: 1300px) {
+  .logOutButton {
+    width: 258px;
+  }
+  .logOutUserName {
+    margin: 0 12px;
+    display: inline-block;
+  }
+  .logOutUserName > div:first-child {
+    font-weight: bold;
+  }
 }
