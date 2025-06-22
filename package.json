@@ -9,10 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth/core": "^0.40.0",
     "@faker-js/faker": "^9.8.0",
     "classnames": "^2.5.1",
     "dayjs": "^1.11.13",
     "next": "15.1.8",
+    "next-auth": "^5.0.0-beta.29",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
