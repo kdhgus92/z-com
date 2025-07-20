@@ -18,15 +18,6 @@ type Props = {
 export default function Post({ noImage, post }: Props) {
   const target = post;
 
-  // if (Math.random() > 0.5 && !noImage) {
-  //   target.Images.push(
-  //     { imageId: 1, link: faker.image.urlPicsumPhotos() },
-  //     { imageId: 2, link: faker.image.urlPicsumPhotos() },
-  //     { imageId: 3, link: faker.image.urlPicsumPhotos() },
-  //     { imageId: 4, link: faker.image.urlPicsumPhotos() }
-  //   );
-  // }
-
   return (
     <PostArticle post={target}>
       <div className={style.postWrapper}>

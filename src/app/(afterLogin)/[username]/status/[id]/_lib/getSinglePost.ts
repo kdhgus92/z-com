@@ -11,6 +11,7 @@ export const getSinglePost = async ({
         tags: ["posts", id],
       },
       credentials: "include",
+      // cache: 'no-store'
     }
   );
   // The return value is *not* serialized
