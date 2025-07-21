@@ -6,7 +6,8 @@ import AuthSession from "@/app/_component/AuthSession";
 
 if (
   process.env.NEXT_RUNTIME === "nodejs" &&
-  process.env.NODE_ENV !== "production"
+  process.env.NODE_ENV !== "production" &&
+  process.env.NEXT_PUBLIC_MSW_ENABLED !== "false"
 ) {
   // const { server } = require('@/mocks/http');
   const { server } = await import("@/mocks/http");
