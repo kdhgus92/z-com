@@ -13,7 +13,7 @@ export default function LogoutButton({ me }: Props) {
   // const { data: me } = useSession();
 
   const onLogout = () => {
-    signOut({ redirect: false }).then(() => {
+    signOut({ callbackUrl: "/" }).then(() => {
       router.replace("/");
     });
   };

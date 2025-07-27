@@ -310,7 +310,7 @@ export default function ActionButtons({ white, post }: Props) {
             </g>
           </svg>
         </button>
-        <div className={style.count}>{post._count.Comments || ""}</div>
+        <div className={style.count}>{post?._count?.Comments || ""}</div>
       </div>
       <div
         className={cx(
@@ -326,7 +326,7 @@ export default function ActionButtons({ white, post }: Props) {
             </g>
           </svg>
         </button>
-        <div className={style.count}>{post._count.Reposts || ""}</div>
+        <div className={style.count}>{post?._count?.Reposts || ""}</div>
       </div>
       <div
         className={cx([
@@ -342,7 +342,7 @@ export default function ActionButtons({ white, post }: Props) {
             </g>
           </svg>
         </button>
-        <div className={style.count}>{post._count.Hearts || ""}</div>
+        <div className={style.count}>{post?._count?.Hearts || ""}</div>
       </div>
     </div>
   );
