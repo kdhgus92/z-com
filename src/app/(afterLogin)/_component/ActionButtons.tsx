@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { MouseEventHandler } from "react";
+import { useRouter } from "next/navigation";
+import { useModalStore } from "@/store/modal";
 
 type Props = {
   white?: boolean;
@@ -17,11 +19,10 @@ type Props = {
 
 export default function ActionButtons({ white, post }: Props) {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { data: session } = useSession();
 
-  const commented = !!post.Comments?.find(
-    (v) => v.userId === session?.user?.email
-  );
+  const modalStore = useModalStore();
   const reposted = !!post.Reposts?.find(
     (v) => v.userId === session?.user?.email
   );
@@ -282,8 +283,171 @@ export default function ActionButtons({ white, post }: Props) {
     onSettled() {},
   });
 
-  const onClickComment = () => {};
-  const onClickRepost = () => {};
+  const repost = useMutation({
+    mutationFn: () => {
+      return fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${post.postId}/reposts`,
+        {
+          method: "post",
+          credentials: "include",
+        }
+      );
+    },
+
+    async onSuccess(response) {
+      const data = await response.json();
+      const queryCache = queryClient.getQueryCache();
+      const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
+      console.log("queryKeys", queryKeys);
+
+      queryKeys.forEach((queryKey) => {
+        if (queryKey[0] === "posts") {
+          console.log(queryKey[0]);
+          const value: Post | InfiniteData<Post[]> | undefined =
+            queryClient.getQueryData(queryKey);
+
+          if (value && "pages" in value) {
+            console.log("array", value);
+            const obj = value.pages.flat().find((v) => v.postId === postId);
+            if (obj) {
+              // 존재는 하는지
+              const pageIndex = value.pages.findIndex((page) =>
+                page.includes(obj)
+              );
+              const index = value.pages[pageIndex].findIndex(
+                (v) => v.postId === postId
+              );
+              console.log("found index", index);
+              const shallow = { ...value };
+              value.pages = { ...value.pages };
+              value.pages[pageIndex] = [...value.pages[pageIndex]];
+              shallow.pages[pageIndex][index] = {
+                ...shallow.pages[pageIndex][index],
+                Reposts: [{ userId: session?.user?.email as string }],
+                _count: {
+                  ...shallow.pages[pageIndex][index]._count,
+                  Reposts: shallow.pages[pageIndex][index]._count.Reposts + 1,
+                },
+              };
+              queryClient.setQueryData(queryKey, shallow);
+            }
+          } else if (value) {
+            // 싱글 포스트인 경우
+            if (value.postId === postId) {
+              const shallow = {
+                ...value,
+                Reposts: [{ userId: session?.user?.email as string }],
+                _count: {
+                  ...value._count,
+                  Reposts: value._count.Reposts + 1,
+                },
+              };
+              queryClient.setQueryData(queryKey, shallow);
+            }
+          }
+        }
+      });
+    },
+  });
+
+  const deleteRepost = useMutation({
+    mutationFn: () => {
+      return fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/posts/${post.postId}/reposts`,
+        {
+          method: "delete",
+          credentials: "include",
+        }
+      );
+    },
+
+    async onSuccess() {
+      const queryCache = queryClient.getQueryCache();
+      const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
+      console.log("queryKeys", queryKeys);
+
+      queryKeys.forEach((queryKey) => {
+        if (queryKey[0] === "posts") {
+          console.log(queryKey[0]);
+          const value: Post | InfiniteData<Post[]> | undefined =
+            queryClient.getQueryData(queryKey);
+
+          if (value && "pages" in value) {
+            console.log("array", value);
+            const obj = value.pages.flat().find((v) => v.postId === postId);
+            const repost = value.pages
+              .flat()
+              .find(
+                (v) =>
+                  v.Original?.postId === postId &&
+                  v.User.id === session?.user?.email
+              );
+            if (obj) {
+              // 존재는 하는지
+              const pageIndex = value.pages.findIndex((page) =>
+                page.includes(obj)
+              );
+              const index = value.pages[pageIndex].findIndex(
+                (v) => v.postId === postId
+              );
+              console.log("found index", index);
+              const shallow = { ...value };
+              value.pages = { ...value.pages };
+              value.pages[pageIndex] = [...value.pages[pageIndex]];
+              shallow.pages[pageIndex][index] = {
+                ...shallow.pages[pageIndex][index],
+                Reposts: shallow.pages[pageIndex][index].Reposts.filter(
+                  (v) => v.userId !== session?.user?.email
+                ),
+                _count: {
+                  ...shallow.pages[pageIndex][index]._count,
+                  Reposts: shallow.pages[pageIndex][index]._count.Reposts - 1,
+                },
+              };
+              // 재개시 삭제
+              shallow.pages = shallow.pages.map((page) => {
+                return page.filter((v) => v.postId !== repost?.postId);
+              });
+              queryClient.setQueryData(queryKey, shallow);
+            }
+          } else if (value) {
+            // 싱글 포스트인 경우
+            if (value.postId === postId) {
+              const shallow = {
+                ...value,
+                Reposts: value.Reposts.filter(
+                  (v) => v.userId !== session?.user?.email
+                ),
+                _count: {
+                  ...value._count,
+                  Reposts: value._count.Reposts - 1,
+                },
+              };
+              queryClient.setQueryData(queryKey, shallow);
+            }
+          }
+        }
+      });
+    },
+  });
+
+  const onClickComment: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+
+    modalStore.setMode("comment");
+    modalStore.setData(post);
+    router.push("/compose/tweet");
+  };
+
+  const onClickRepost: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!reposted) {
+      repost.mutate();
+    } else {
+      deleteRepost.mutate();
+    }
+  };
 
   const onClickHeart: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.stopPropagation();
@@ -296,13 +460,7 @@ export default function ActionButtons({ white, post }: Props) {
 
   return (
     <div className={style.actionButtons}>
-      <div
-        className={cx(
-          style.commentButton,
-          { [style.commented]: commented },
-          white && style.white
-        )}
-      >
+      <div className={cx(style.commentButton, white && style.white)}>
         <button onClick={onClickComment}>
           <svg width={24} viewBox="0 0 24 24" aria-hidden="true">
             <g>
@@ -310,7 +468,7 @@ export default function ActionButtons({ white, post }: Props) {
             </g>
           </svg>
         </button>
-        <div className={style.count}>{post?._count?.Comments || ""}</div>
+        <div className={style.count}>{post._count?.Comments || ""}</div>
       </div>
       <div
         className={cx(
@@ -326,7 +484,7 @@ export default function ActionButtons({ white, post }: Props) {
             </g>
           </svg>
         </button>
-        <div className={style.count}>{post?._count?.Reposts || ""}</div>
+        <div className={style.count}>{post._count?.Reposts || ""}</div>
       </div>
       <div
         className={cx([
@@ -342,7 +500,7 @@ export default function ActionButtons({ white, post }: Props) {
             </g>
           </svg>
         </button>
-        <div className={style.count}>{post?._count?.Hearts || ""}</div>
+        <div className={style.count}>{post._count?.Hearts || ""}</div>
       </div>
     </div>
   );
