@@ -10,8 +10,9 @@ import {
   useState,
 } from "react";
 import { useSession } from "next-auth/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { InfiniteData, useQueryClient } from "@tanstack/react-query";
 import useSocket from "@/app/(afterLogin)/messages/[room]/_lib/useSocket";
+import { Message } from "@/model/Message";
 
 interface Props {
   id: string;
@@ -41,6 +42,43 @@ export default function MessageForm({ id }: Props) {
     });
 
     // 리액트 쿼리 데이터에 추가
+    const exMessages = queryClient.getQueryData([
+      "rooms",
+      {
+        senderId: session?.user?.email,
+        receiverId: id,
+      },
+      "messages",
+    ]) as InfiniteData<Message[]>;
+
+    if (exMessages && typeof exMessages === "object") {
+      const newMessages = {
+        ...exMessages,
+        pages: [...exMessages.pages],
+      };
+      const lastPage = newMessages.pages.at(-1);
+      const newLastPage = lastPage ? [...lastPage] : [];
+      const lastMessageId = lastPage?.at(-1)?.messageId;
+      newLastPage.push({
+        senderId: session.user.email,
+        receiverId: id,
+        content,
+        room: ids.join("-"),
+        messageId: lastMessageId ? lastMessageId + 1 : 1,
+        createdAt: new Date(),
+      });
+
+      newMessages.pages[newMessages.pages.length - 1] = newLastPage;
+      queryClient.setQueryData(
+        [
+          "rooms",
+          { senderId: session?.user?.email, receiverId: id },
+          "messages",
+        ],
+        newMessages
+      );
+      setGoDown(true);
+    }
 
     setContent("");
   };

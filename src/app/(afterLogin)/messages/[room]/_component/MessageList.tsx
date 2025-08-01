@@ -117,7 +117,7 @@ export default function MessageList({ id }: Props) {
   const [socket] = useSocket();
   useEffect(() => {
     socket?.on("receiveMessage", (data) => {
-      console.log("data", data);
+      console.log("data receive!!@!@", data);
       // 리액트 쿼리 데이터에 추가
       const exMessages = queryClient.getQueryData([
         "rooms",
@@ -139,7 +139,7 @@ export default function MessageList({ id }: Props) {
         queryClient.setQueryData(
           [
             "rooms",
-            { senderId: session?.user?.email, recevierId: id },
+            { senderId: session?.user?.email, receiverId: id },
             "messages",
           ],
           newMessages

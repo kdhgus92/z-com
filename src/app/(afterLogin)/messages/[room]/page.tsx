@@ -1,5 +1,4 @@
 import style from "./chatRoom.module.css";
-import cx from "classnames";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/ko";
 import dayjs from "dayjs";
@@ -15,14 +14,15 @@ dayjs.locale("ko");
 dayjs.extend(relativeTime);
 
 type Props = {
-  params: { room: string };
+  params: Promise<{ room: string }>;
 };
 export default async function ChatRoom({ params }: Props) {
   const session = await auth();
   const queryClient = new QueryClient();
+  const { room } = await params;
 
   // 상대방 ID
-  const ids = params.room.split("-").filter((v) => v !== session?.user?.email);
+  const ids = room.split("-").filter((v) => v !== session?.user?.email);
 
   if (!ids[0]) {
     return null;
@@ -33,6 +33,8 @@ export default async function ChatRoom({ params }: Props) {
     queryKey: ["users", ids[0]],
     queryFn: getUserServer,
   });
+
+  // const user = await getUserServer({ queryKey: ["users", ids[0]] });
 
   const messages = [
     {
