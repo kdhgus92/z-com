@@ -1,6 +1,6 @@
 "use client";
 
-import style from "@/app/(beforeLogin)/_component/login.module.css";
+import * as style from "@/app/(beforeLogin)/_component/login.css";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ChangeEventHandler, FormEventHandler, useState } from "react";

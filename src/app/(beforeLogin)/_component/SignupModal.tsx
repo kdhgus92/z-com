@@ -1,6 +1,6 @@
 "use client";
 
-import style from "./signup.module.css";
+import * as style from "./signup.css";
 import onSubmit from "../_lib/signup";
 import BackButton from "./BackButton";
 import Form from "next/form";

@@ -20,17 +20,15 @@
 .modal {
   background-color: rgb(var(--background-end-rgb));
   position: relative;
-  top: 5%;
-  max-width: 80vw;
-  min-width: 600px;
+  width: 100%;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
-  height: 550px;
+  padding: 32px;
 }
 
 .modalHeader {
-  padding: 36px 80px 20px;
+  padding: 36px 0 20px;
   font-size: 31px;
   font-weight: bold;
 }
@@ -43,11 +41,10 @@
 
 .modalBody {
   flex: 1;
-  padding: 0 80px;
 }
 
 @media all and (min-width: 687px) {
-  Add commentMore actions .modal {
+  .modal {
     top: 5%;
     min-width: 600px;
     max-width: 600px;
@@ -91,6 +88,7 @@
   margin-top: 16px;
   padding: 12px 8px 8px;
   outline: none;
+  background: transparent;
 }
 
 .modalFooter {
@@ -124,7 +122,6 @@
   cursor: pointer;
   background-color: #fff;
   position: absolute;
-  left: 16px;
   top: 16px;
   display: flex;
   align-items: center;
@@ -151,3 +148,5 @@
   font-weight: bold;
   color: red;
 }
+
+/* 이런 주석 */
